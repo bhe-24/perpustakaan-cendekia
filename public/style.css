@@ -1,0 +1,31 @@
+/* Tombol Magic */
+#magic-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Kondisi Aktif (Merah/Oranye) */
+.btn-active {
+    background: linear-gradient(45deg, #ff416c, #ff4b2b);
+    color: white;
+}
+
+.btn-active:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 75, 43, 0.4);
+}
+
+/* Kondisi Mati/Habis (Abu-abu) */
+.btn-disabled {
+    background-color: #bdc3c7;
+    color: #7f8c8d;
+    cursor: not-allowed;
+    pointer-events: none; /* Tidak bisa diklik */
+    box-shadow: none;
+}
