@@ -13,14 +13,50 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Elemen UI
+// --- HELPER: FORMAT TEXT (POIN 5) ---
+// Mengubah teks polos/markdown menjadi HTML yang enak dibaca (Bold, Italic, Paragraf)
+function formatContent(text) {
+    if (!text) return "";
+    let formatted = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')             // Italic
+        .replace(/\n\n/g, '<br><br>')                     // Paragraf baru
+        .replace(/\n/g, '<br>');                           // Baris baru
+    return `<div style="text-align: left; line-height: 1.6; font-size: 1rem; color: #334155;">${formatted}</div>`;
+}
+
+// --- FUNGSI TAMPILKAN POP-UP BACA (POIN 3 & 7) ---
+window.openArticle = function(title, content, date, category) {
+    Swal.fire({
+        title: `<h3 style="font-family: 'Outfit'; color: #0f172a;">${title}</h3>`,
+        html: `
+            <div style="margin-bottom: 15px;">
+                <span style="background: #f1f5f9; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; color: #64748b;">
+                    <i class="fa-regular fa-calendar"></i> ${date}
+                </span>
+                <span style="background: #fff7ed; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; color: #d97706; margin-left: 5px;">
+                    ${category}
+                </span>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
+            ${formatContent(content)}
+        `,
+        width: '700px',
+        showConfirmButton: true,
+        confirmButtonText: 'Tutup',
+        confirmButtonColor: '#0f172a',
+        showClass: { popup: 'animate__animated animate__fadeInUp' }
+    });
+};
+
+// --- LOGIKA UTAMA ---
 const magicBtn = document.getElementById('magic-btn');
 const quotaCountSpan = document.getElementById('quota-count');
 const contentContainer = document.getElementById('content-container');
 const pageTitle = document.getElementById('page-title');
 const MAX_QUOTA = 5;
 
-// --- RESET KUOTA JAM 7 ---
+// Cek Reset Kuota
 function checkQuotaReset() {
     const lastReset = localStorage.getItem('lastResetDate');
     const today = new Date().toISOString().split('T')[0];
@@ -39,42 +75,38 @@ function updateButtonUI() {
 
     if (currentQuota > 0) {
         magicBtn.classList.remove('btn-disabled');
-        magicBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> &nbsp;Generate Materi AI`;
+        magicBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Baru`;
         magicBtn.disabled = false;
     } else {
         magicBtn.classList.add('btn-disabled');
-        magicBtn.innerHTML = `<i class="fa-solid fa-bed"></i> &nbsp;AI Sedang Istirahat`;
+        magicBtn.innerHTML = `Kuota Habis`;
         magicBtn.disabled = true;
     }
 }
 
-// --- FUNGSI UTAMA: TRIGGER AI ---
+// Trigger AI
 window.triggerMagic = async function() {
     let currentQuota = parseInt(localStorage.getItem('quota'));
     if (isNaN(currentQuota)) currentQuota = 5;
 
     if (currentQuota > 0) {
-        // Konfirmasi dulu biar keren
         const confirm = await Swal.fire({
-            title: 'Panggil Aksa AI?',
-            text: "Satu kuota akan terpakai untuk membuat materi baru.",
+            title: 'Buat Materi Baru?',
+            text: "Aksa akan menulis materi/tips acak untukmu.",
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#f59e0b',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: 'Ya, Buat!',
+            confirmButtonColor: '#0f172a',
+            confirmButtonText: 'Gas!',
             cancelButtonText: 'Batal'
         });
 
         if (!confirm.isConfirmed) return;
 
-        // Proses Dimulai
         currentQuota--;
         localStorage.setItem('quota', currentQuota);
         updateButtonUI();
         
-        // Ubah tombol jadi loading
-        magicBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> &nbsp;Sedang Meracik...`;
+        magicBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Meracik...`;
         magicBtn.disabled = true;
 
         try {
@@ -83,32 +115,20 @@ window.triggerMagic = async function() {
 
             if (dataMateri.error) throw new Error(dataMateri.error);
 
-            // Simpan ke Firebase
+            // Simpan data
             await addDoc(collection(db, "posts"), {
                 title: dataMateri.title,
                 content: dataMateri.content,
-                category: dataMateri.category.toLowerCase(),
+                category: dataMateri.category, // Tidak di-lowercase biar rapi
                 timestamp: new Date()
             });
 
-            // Pop-up SUKSES Modern
-            Swal.fire({
-                title: 'Berhasil Terbit!',
-                text: dataMateri.title,
-                icon: 'success',
-                confirmButtonColor: '#1e293b'
-            });
-
+            Swal.fire('Selesai!', `Materi "${dataMateri.title}" sudah terbit.`, 'success');
             loadCategory('terbaru');
 
         } catch (error) {
             console.error(error);
-            // Pop-up ERROR Modern
-            Swal.fire({
-                title: 'Ups, Gangguan!',
-                text: 'Maaf, Aksa sedang pusing. Kuota dikembalikan.',
-                icon: 'error'
-            });
+            Swal.fire('Gagal', 'Ada gangguan jaringan.', 'error');
             localStorage.setItem('quota', currentQuota + 1);
         } finally {
             updateButtonUI();
@@ -116,25 +136,20 @@ window.triggerMagic = async function() {
     }
 };
 
-// --- LOAD KONTEN ---
+// Load Kategori
 window.loadCategory = async function(category) {
-    // Update Menu Aktif
+    // Highlight Menu
     document.querySelectorAll('.menu li').forEach(el => el.classList.remove('active'));
-    // (Opsional: Tambahkan logika highlight menu yg diklik)
+    // Cari elemen menu yg diklik (manual logic simple)
+    const menuIcon = category === 'terbaru' ? 'fa-house' : (category === 'materi' ? 'fa-book-open' : 'fa-feather');
+    // ... (bisa dikembangkan utk highlight otomatis)
 
-    if(pageTitle) pageTitle.innerText = category === 'terbaru' ? 'Terbaru Hari Ini' : capitalize(category);
+    pageTitle.innerText = category === 'terbaru' ? 'Terbaru' : (category.charAt(0).toUpperCase() + category.slice(1));
     
-    // Tampilkan Loading Spinner Keren
-    if(contentContainer) contentContainer.innerHTML = `
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Sedang mengambil buku di rak...</p>
-        </div>
-    `;
+    contentContainer.innerHTML = `<div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat...</div>`;
 
     try {
         const postsRef = collection(db, "posts");
-        // Ambil data urut waktu
         const q = query(postsRef, orderBy("timestamp", "desc"));
         const querySnapshot = await getDocs(q);
         
@@ -143,21 +158,48 @@ window.loadCategory = async function(category) {
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            // Filter Client-side
-            if (category !== 'terbaru' && data.category !== category) return;
+            
+            // POIN 4: FILTER KATEGORI KETAT
+            // Kategori yang diizinkan hanya: Materi, Artikel, Tips
+            // Kita normalisasi stringnya biar cocok
+            let catDB = (data.category || 'Umum').toLowerCase();
+            let catFilter = category.toLowerCase();
+
+            // Logic Filter:
+            // 1. Jika user minta 'terbaru', tampilkan SEMUA yg kategori 'materi' atau 'artikel' (tips). Jangan tampilkan novel/umum.
+            // 2. Jika user minta spesifik 'materi', tampilkan 'materi' saja.
+            
+            const isMateri = catDB.includes('materi');
+            const isArtikel = catDB.includes('artikel') || catDB.includes('tips');
+
+            if (category === 'terbaru') {
+                if (!isMateri && !isArtikel) return; // Skip novel/umum
+            } else if (category === 'materi') {
+                if (!isMateri) return;
+            } else if (category === 'artikel') {
+                if (!isArtikel) return;
+            }
 
             hasData = true;
-            const dateStr = data.timestamp ? data.timestamp.toDate().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : "Baru saja";
+            const dateStr = data.timestamp ? data.timestamp.toDate().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : "-";
+            
+            // Siapkan data untuk dikirim ke fungsi Pop-up (escape tanda petik biar gak error)
+            const safeTitle = data.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const safeContent = data.content.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+            const safeCat = data.category || 'Materi';
 
-            // HTML Kartu yang lebih rapi
+            // POIN 2 & 6: KARTU CUPLIKAN
             const cardHTML = `
-                <div class="card">
-                    <span class="card-tag">${data.category || 'Umum'}</span>
+                <div class="card" data-cat="${isArtikel ? 'tips' : 'materi'}" 
+                     onclick="openArticle('${safeTitle}', '${safeContent}', '${dateStr}', '${safeCat}')">
+                    
+                    <span class="card-tag">${safeCat}</span>
                     <h3 class="card-title">${data.title}</h3>
-                    <p class="card-excerpt">${data.content}</p>
-                    <div class="card-meta">
-                        <span><i class="fa-regular fa-calendar"></i> ${dateStr}</span>
-                        <span><i class="fa-solid fa-robot"></i> Aksa AI</span>
+                    <p class="card-excerpt">${data.content}</p> 
+                    
+                    <div class="card-footer">
+                        <span><i class="fa-regular fa-clock"></i> ${dateStr}</span>
+                        <span class="read-more">Baca <i class="fa-solid fa-arrow-right"></i></span>
                     </div>
                 </div>
             `;
@@ -165,24 +207,15 @@ window.loadCategory = async function(category) {
         });
 
         if (!hasData) {
-            contentContainer.innerHTML = `
-                <div class="loading-state">
-                    <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 10px;"></i>
-                    <p>Belum ada materi di rak ini.</p>
-                </div>`;
+            contentContainer.innerHTML = `<div class="loading-state">Belum ada konten di kategori ini.</div>`;
         }
 
     } catch (error) {
         console.error(error);
-        if(contentContainer) contentContainer.innerHTML = `<p>Gagal memuat data.</p>`;
+        contentContainer.innerHTML = `<p style="text-align:center">Gagal memuat data.</p>`;
     }
 };
 
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-// Init
 checkQuotaReset();
 updateButtonUI();
 loadCategory('terbaru');
