@@ -7,20 +7,25 @@
     
     <link rel="stylesheet" href="style.css">
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <nav class="sidebar">
         <div class="logo">
+            <i class="fa-solid fa-feather-pointed"></i>
             <h2>Cendekia<br><span>Aksa.</span></h2>
         </div>
         <ul class="menu">
-            <li class="active" onclick="loadCategory('terbaru')">🏠 Beranda</li>
-            <li onclick="loadCategory('materi')">📚 Materi Belajar</li>
-            <li onclick="loadCategory('artikel')">💡 Artikel Tips</li>
-            <li onclick="loadCategory('novel')">📖 Cerpen & Novel</li>
-            <li onclick="loadCategory('perpustakaan')">🏛️ Rak Pustaka</li>
+            <li class="active" onclick="loadCategory('terbaru')"><i class="fa-solid fa-house"></i> Beranda</li>
+            <li onclick="loadCategory('materi')"><i class="fa-solid fa-book-open"></i> Materi</li>
+            <li onclick="loadCategory('artikel')"><i class="fa-solid fa-lightbulb"></i> Tips Nulis</li>
+            <li onclick="loadCategory('novel')"><i class="fa-solid fa-scroll"></i> Cerpen AI</li>
+            <li onclick="loadCategory('perpustakaan')"><i class="fa-solid fa-landmark"></i> Arsip</li>
         </ul>
         <div class="footer-nav">
             <p>© 2026 Cendekia Aksara</p>
@@ -29,20 +34,26 @@
 
     <main class="main-content">
         <header>
-            <h1 id="page-title">Beranda</h1>
-            <p>Selamat datang di ruang tumbuh para penulis.</p>
+            <div class="header-text">
+                <h1 id="page-title">Beranda</h1>
+                <p>Ruang tumbuh penulis masa depan.</p>
+            </div>
+            
+            <div class="magic-wrapper">
+                <button id="magic-btn" onclick="triggerMagic()" class="btn-magic">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> &nbsp;Generate Materi AI
+                </button>
+                <div class="quota-badge">
+                    <i class="fa-solid fa-bolt"></i> Sisa: <span id="quota-count">5</span>
+                </div>
+            </div>
         </header>
 
-        <div class="magic-section" style="text-align: center; margin-bottom: 30px;">
-            <button id="magic-btn" onclick="triggerMagic()" class="btn-active">
-                ✨ Buat Materi Ajaib (AI)
-            </button>
-            <p id="quota-text" style="font-size: 0.8rem; color: #666; margin-top: 5px;">
-                Sisa kuota hari ini: <span id="quota-count">5</span>
-            </p>
-        </div>
         <div class="content-grid" id="content-container">
-            <div class="loading-card">Sedang memuat karya AI... 🤖</div>
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Sedang memuat pustaka...</p>
+            </div>
         </div>
     </main>
 
