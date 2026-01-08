@@ -14,13 +14,13 @@ export default async function handler(req, res) {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Prompt Khusus Cendekia Aksara
     const prompt = `
-      Buatkan satu materi singkat atau tips menulis kreatif untuk pemula. 
+      Buatkan satu materi singkat atau tips menulis kreatif seperti Novel, cerita pendek, puisi, ataupun karya sastra lainnya untuk pemula. 
       Berikan Judul yang menarik.
-      Isinya sekitar 50-100 kata saja. 
+      Isinya sekitar 300-500 kata saja. 
       Tentukan kategorinya (Materi, Artikel, atau Novel).
       Hasilkan output HANYA JSON murni.
       Format: { "title": "Judul", "content": "Isi materi...", "category": "Materi" }
