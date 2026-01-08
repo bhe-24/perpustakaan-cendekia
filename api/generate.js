@@ -10,17 +10,27 @@ export default async function handler(req, res) {
   try {
     console.log("1. Memulai fungsi AI...");
 
-    // --- STRATEGI BARU: Ambil variabel terpisah ---
+    // --- BAGIAN INI YANG DIPERBAIKI (JURUS RAKIT ULANG) ---
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    // Trik pembersih kunci tetap kita pakai
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY 
-      ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') 
-      : undefined;
+    let rawKey = process.env.FIREBASE_PRIVATE_KEY;
 
-    if (!projectId || !clientEmail || !privateKey) {
-      throw new Error("Kunci Firebase tidak lengkap di Vercel (Cek PROJECT_ID, CLIENT_EMAIL, PRIVATE_KEY).");
+    if (!projectId || !clientEmail || !rawKey) {
+      throw new Error("Kunci Firebase tidak lengkap di Vercel.");
     }
+
+    // 1. Bersihkan kunci dari header, footer, spasi, dan enter
+    // Kita ambil hanya kode acak di tengahnya saja
+    const cleanKey = rawKey
+      .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+      .replace(/-----END PRIVATE KEY-----/g, '')
+      .replace(/\\n/g, '') // Hapus literal \n
+      .replace(/\s/g, ''); // Hapus semua spasi & enter asli
+
+    // 2. Rakit ulang dengan format yang 100% Benar
+    const finalPrivateKey = `-----BEGIN PRIVATE KEY-----\n${cleanKey}\n-----END PRIVATE KEY-----\n`;
+    
+    // ------------------------------------------------------
 
     if (!getApps().length) {
       console.log("2. Inisialisasi Firebase Manual...");
@@ -29,7 +39,7 @@ export default async function handler(req, res) {
         credential: cert({
           projectId: projectId,
           clientEmail: clientEmail,
-          privateKey: privateKey,
+          privateKey: finalPrivateKey,
         })
       });
       console.log("3. Firebase berhasil login!");
@@ -39,7 +49,7 @@ export default async function handler(req, res) {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
     console.log("4. Menghubungi Gemini...");
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const prompt = `
       Buatkan satu materi singkat atau tips menulis kreatif untuk pemula. 
       Berikan Judul yang menarik di baris pertama.
