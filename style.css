@@ -1,4 +1,73 @@
-/* Tombol Magic */
+/* --- 1. DASAR & VARIABEL --- */
+:root {
+    --primary: #2c3e50;    /* Biru Gelap */
+    --accent: #e67e22;     /* Oranye Semangat */
+    --bg: #f4f7f6;
+    --white: #ffffff;
+    --text-grey: #666;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg);
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- 2. SIDEBAR (NAVIGASI KIRI) --- */
+.sidebar {
+    width: 250px;
+    background: var(--white);
+    padding: 30px;
+    position: fixed;
+    height: 100%;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+    z-index: 100; /* Supaya selalu di atas */
+}
+
+.logo h2 {
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+}
+.logo span { color: var(--accent); }
+
+.menu li {
+    list-style: none;
+    padding: 15px;
+    cursor: pointer;
+    color: var(--text-grey);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+.menu li:hover, .menu li.active {
+    background-color: var(--primary);
+    color: var(--white);
+    transform: translateX(5px);
+}
+
+.footer-nav {
+    position: absolute;
+    bottom: 20px;
+    font-size: 0.8rem;
+    color: #999;
+}
+
+/* --- 3. KONTEN UTAMA --- */
+.main-content {
+    margin-left: 250px; /* Memberi ruang untuk sidebar */
+    padding: 40px;
+    width: 100%;
+}
+
+header { margin-bottom: 30px; }
+header h1 { color: var(--primary); font-size: 2rem; }
+
+/* --- 4. GAYA TOMBOL MAGIC AI (YANG BARU) --- */
 #magic-btn {
     padding: 12px 25px;
     border: none;
@@ -8,6 +77,7 @@
     cursor: pointer;
     transition: 0.3s;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    margin-bottom: 10px;
 }
 
 /* Kondisi Aktif (Merah/Oranye) */
@@ -26,6 +96,67 @@
     background-color: #bdc3c7;
     color: #7f8c8d;
     cursor: not-allowed;
-    pointer-events: none; /* Tidak bisa diklik */
+    pointer-events: none;
     box-shadow: none;
+}
+
+/* --- 5. GRID & KARTU KONTEN --- */
+.content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: var(--white);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+.card-tag {
+    background: var(--accent);
+    color: white;
+    padding: 5px 15px;
+    font-size: 0.8rem;
+    width: fit-content;
+    margin: 15px 15px 0 15px;
+    border-radius: 20px;
+}
+
+.card-body { padding: 20px; flex-grow: 1; }
+.card-title { font-size: 1.2rem; color: var(--primary); margin-bottom: 10px; }
+.card-excerpt { font-size: 0.9rem; color: var(--text-grey); line-height: 1.6; }
+
+.card-meta {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    font-size: 0.8rem;
+    color: #999;
+    display: flex;
+    justify-content: space-between;
+}
+
+.loading-card {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    grid-column: 1 / -1;
+    padding: 20px;
+}
+
+/* --- 6. RESPONSIVE (UNTUK HP) --- */
+@media (max-width: 768px) {
+    .sidebar { width: 70px; padding: 20px 10px; }
+    .logo h2, .menu li span, .footer-nav { display: none; } 
+    .menu li { text-align: center; font-size: 1.5rem; padding: 10px; }
+    .main-content { margin-left: 70px; padding: 20px; }
+    
+    /* Penyesuaian Tombol di HP */
+    #magic-btn { width: 100%; font-size: 0.9rem; }
 }
