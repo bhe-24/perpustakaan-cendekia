@@ -1,8 +1,10 @@
 {
   "name": "cendekia-aksara-ai",
   "version": "1.0.0",
+  "description": "Backend AI untuk Cendekia Aksara",
+  "main": "api/generate.js",
   "dependencies": {
-    "firebase-admin": "^11.11.1",
-    "@google/generative-ai": "^0.16.0"
+    "firebase-admin": "^12.0.0",
+    "@google/generative-ai": "^0.1.3"
   }
 }
