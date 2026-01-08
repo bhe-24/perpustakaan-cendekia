@@ -22,10 +22,10 @@ export default async function handler(req, res) {
 
     // Prompt Khusus Cendekia Aksara
     const prompt = `
-      Buatkan satu materi singkat atau tips menulis kreatif untuk pemula. 
+      Buatkan satu materi atau tips menulis kreatif seperti novel, cerpen, puisi, dan karya sastra lainnya untuk pemula. Bisa dijelaskan tata cara menulis, brainstroming, profheading yang benar untuk menghasilkan suatu karya yang baik.
       Berikan Judul yang menarik.
-      Isinya sekitar 50-100 kata saja. 
-      Tentukan kategorinya (Materi, Artikel, atau Novel).
+      Isinya sekitar 350-1000 kata. 
+      Tentukan kategorinya (Materi, Artikel).
       Hasilkan output HANYA JSON murni.
       Format: { "title": "Judul", "content": "Isi materi...", "category": "Materi" }
     `;
