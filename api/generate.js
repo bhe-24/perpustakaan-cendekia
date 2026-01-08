@@ -1,10 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export default async function handler(req, res) {
+  // Hanya izinkan POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
+  // Ambil API Key
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'API Key belum disetting!' });
@@ -12,9 +14,11 @@ export default async function handler(req, res) {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    // KITA PAKAI MODEL STANDAR (JANGAN DIGANTI LAGI)
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    // Poin 4: Membatasi kategori hanya 'Materi' atau 'Tips' (Artikel)
+    // Prompt
     const prompt = `
       Buatkan satu konten edukasi menulis kreatif untuk pemula.
       Pilih salah satu jenis: 'Materi' (teori sastra) atau 'Artikel' (tips praktis).
@@ -24,21 +28,21 @@ export default async function handler(req, res) {
       
       Output WAJIB JSON murni:
       { "title": "...", "content": "...", "category": "..." }
-      
-      Catatan: category hanya boleh diisi 'Materi' atau 'Artikel'.
     `;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
 
+    // Bersihkan JSON
     text = text.replace(/```json/g, '').replace(/```/g, '').trim();
     const dataJSON = JSON.parse(text);
 
     return res.status(200).json(dataJSON);
 
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error("Server Error:", error);
+    // Jika error, kirim pesan yang jelas
     return res.status(500).json({ error: error.message });
   }
 }
