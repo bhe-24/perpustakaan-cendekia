@@ -5,30 +5,239 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cendekia Aksara - Portal Belajar</title>
     
-    <link rel="stylesheet" href="style.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- 1. VARIABEL & RESET --- */
+        :root {
+            --primary: #0f172a;     /* Navy Gelap */
+            --accent: #d97706;      /* Emas/Amber */
+            --bg-body: #f1f5f9;     /* Abu sangat muda */
+            --white: #ffffff;
+            --text-main: #334155;
+            --text-light: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- 2. SIDEBAR --- */
+        .sidebar {
+            width: 280px;
+            background: var(--white);
+            padding: 30px;
+            position: fixed;
+            height: 100%;
+            border-right: 1px solid #e2e8f0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .logo-text h2 {
+            color: var(--primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .logo-text span { color: var(--accent); }
+
+        .menu { flex-grow: 1; }
+
+        .menu li {
+            list-style: none;
+            padding: 14px 20px;
+            cursor: pointer;
+            color: var(--text-light);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu li:hover, .menu li.active {
+            background-color: #fff7ed; /* Orange muda */
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .menu li i { width: 20px; text-align: center; }
+
+        .footer-nav { font-size: 0.75rem; color: #cbd5e1; text-align: center; margin-top: auto; }
+
+        /* --- 3. KONTEN UTAMA --- */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px 60px;
+            width: 100%;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 { font-family: 'Outfit', sans-serif; font-size: 2rem; color: var(--primary); }
+        header p { color: var(--text-light); margin-top: 5px; }
+
+        /* --- 4. TOMBOL MAGIC --- */
+        .magic-wrapper { display: flex; align-items: center; gap: 15px; }
+
+        .btn-magic {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3);
+            transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .btn-magic:hover { transform: translateY(-2px); background: var(--accent); }
+        .btn-disabled { background: #cbd5e1; cursor: not-allowed; transform: none !important; }
+
+        .quota-badge {
+            background: white; padding: 8px 15px; border-radius: 30px;
+            font-size: 0.85rem; color: var(--primary); border: 1px solid #e2e8f0; font-weight: 600;
+        }
+
+        /* --- 5. GRID KARTU (SNIPPET) --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+            border: 1px solid #f1f5f9;
+            cursor: pointer; /* Menandakan bisa diklik */
+            display: flex; flex-direction: column;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-color: var(--accent);
+        }
+
+        .card-tag {
+            background: #f0f9ff; color: #0369a1;
+            padding: 5px 12px; font-size: 0.7rem; font-weight: 700;
+            border-radius: 20px; text-transform: uppercase;
+            width: fit-content; margin-bottom: 15px;
+        }
+        
+        .card[data-cat="tips"] .card-tag { background: #fff7ed; color: #c2410c; }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem; color: var(--primary);
+            margin-bottom: 10px; line-height: 1.4;
+        }
+
+        .card-excerpt {
+            font-size: 0.9rem; color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            /* Membatasi teks jadi 3 baris lalu titik-titik */
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.8rem; color: #94a3b8;
+            border-top: 1px solid #f1f5f9; padding-top: 15px;
+        }
+
+        .read-more {
+            color: var(--accent); font-weight: 600; font-size: 0.85rem;
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        /* --- LOADING & RESPONSIVE --- */
+        .loading-state { grid-column: 1 / -1; text-align: center; padding: 50px; color: var(--text-light); }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 80px; padding: 20px 10px; }
+            .logo-text, .menu li span, .footer-nav { display: none; }
+            .logo, .menu li { justify-content: center; }
+            .logo img { width: 40px; height: 40px; }
+            .main-content { margin-left: 80px; padding: 20px; }
+            header { flex-direction: column; align-items: flex-start; gap: 20px; }
+        }
+    </style>
 </head>
 <body>
 
     <nav class="sidebar">
         <div class="logo">
-            <i class="fa-solid fa-feather-pointed"></i>
-            <h2>Cendekia<br><span>Aksa.</span></h2>
+            <img src="https://imgur.com/5Srjyo4.png" alt="Logo Cendekia">
+            <div class="logo-text">
+                <h2>Cendekia<br><span>Aksa.</span></h2>
+            </div>
         </div>
+        
         <ul class="menu">
-            <li class="active" onclick="loadCategory('terbaru')"><i class="fa-solid fa-house"></i> Beranda</li>
-            <li onclick="loadCategory('materi')"><i class="fa-solid fa-book-open"></i> Materi</li>
-            <li onclick="loadCategory('artikel')"><i class="fa-solid fa-lightbulb"></i> Tips Nulis</li>
-            <li onclick="loadCategory('novel')"><i class="fa-solid fa-scroll"></i> Cerpen AI</li>
-            <li onclick="loadCategory('perpustakaan')"><i class="fa-solid fa-landmark"></i> Arsip</li>
+            <li class="active" onclick="loadCategory('terbaru')">
+                <i class="fa-solid fa-house"></i> <span>Beranda</span>
+            </li>
+            <li onclick="loadCategory('materi')">
+                <i class="fa-solid fa-book-open"></i> <span>Materi</span>
+            </li>
+            <li onclick="loadCategory('artikel')">
+                <i class="fa-solid fa-feather"></i> <span>Tips Menulis</span>
+            </li>
         </ul>
+
         <div class="footer-nav">
-            <p>© 2026 Cendekia Aksara</p>
+            <p>Ver 2.0 (Modern)</p>
         </div>
     </nav>
 
@@ -36,25 +245,21 @@
         <header>
             <div class="header-text">
                 <h1 id="page-title">Beranda</h1>
-                <p>Ruang tumbuh penulis masa depan.</p>
+                <p>Kumpulan materi dan tips menulis terbaik.</p>
             </div>
             
             <div class="magic-wrapper">
                 <button id="magic-btn" onclick="triggerMagic()" class="btn-magic">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> &nbsp;Generate Materi AI
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Baru
                 </button>
                 <div class="quota-badge">
-                    <i class="fa-solid fa-bolt"></i> Sisa: <span id="quota-count">5</span>
+                    <i class="fa-solid fa-bolt"></i> <span id="quota-count">5</span>
                 </div>
             </div>
         </header>
 
         <div class="content-grid" id="content-container">
-            <div class="loading-state">
-                <div class="spinner"></div>
-                <p>Sedang memuat pustaka...</p>
             </div>
-        </div>
     </main>
 
     <script type="module" src="app.js"></script>
