@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cendekia Aksara - Portal Belajar</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">
+            <h2>Cendekia<br><span>Aksa.</span></h2>
+        </div>
+        <ul class="menu">
+            <li class="active" onclick="loadCategory('terbaru')">🏠 Beranda</li>
+            <li onclick="loadCategory('materi')">📚 Materi Belajar</li>
+            <li onclick="loadCategory('artikel')">💡 Artikel Tips</li>
+            <li onclick="loadCategory('novel')">📖 Cerpen & Novel</li>
+            <li onclick="loadCategory('perpustakaan')">🏛️ Rak Pustaka</li>
+        </ul>
+        <div class="footer-nav">
+            <p>© 2025 Cendekia Aksara</p>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header>
+            <h1 id="page-title">Beranda</h1>
+            <p>Selamat datang di ruang tumbuh para penulis.</p>
+        </header>
+
+        <div class="content-grid" id="content-container">
+            <div class="loading-card">Sedang memuat karya AI... 🤖</div>
+        </div>
+    </main>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
